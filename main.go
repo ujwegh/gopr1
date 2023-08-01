@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"html/template"
+	"gopr/controllers"
+	"gopr/views"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,25 +30,24 @@ func galleriesHandler(w http.ResponseWriter, r *http.Request) {
 
 func executeTemplate(w http.ResponseWriter, filepath string) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tpl, err := template.ParseFiles(filepath)
+	tpl, err := views.Parse(filepath)
 	if err != nil {
 		log.Printf("parsing template: %v", err)
 		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
 		return
 	}
-	err = tpl.Execute(w, nil)
-	if err != nil {
-		log.Printf("executing template: %v", err)
-		http.Error(w, "There was an error executing the template.", http.StatusInternalServerError)
-		return
-	}
+	tpl.Execute(w, nil)
 }
 func main() {
 	r := chi.NewRouter()
+
+	tpl := views.Must(views.Parse(filepath.Join("templates", "home.gohtml")))
 	r.Use(middleware.Logger)
-	r.Get("/", homeHandler)
-	r.Get("/contact", contactHandler)
-	r.Get("/faq", faqHandler)
+	r.Get("/", controllers.StaticHandler(tpl))
+	tpl = views.Must(views.Parse(filepath.Join("templates", "contact.gohtml")))
+	r.Get("/contact", controllers.StaticHandler(tpl))
+	tpl = views.Must(views.Parse(filepath.Join("templates", "faq.gohtml")))
+	r.Get("/faq", controllers.StaticHandler(tpl))
 	r.Get("/galleries/{id}", galleriesHandler)
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Page not found", http.StatusNotFound)
