@@ -31,7 +31,7 @@ func Parse(filePath string) (Template, error) {
 	}, nil
 }
 
-func Must(t Template, err error) Template {
+func MustParse(t Template, err error) Template {
 	if err != nil {
 		panic(err)
 	}
