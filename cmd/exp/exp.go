@@ -30,7 +30,6 @@ func main() {
 	if err != nil {
 
 	}
-
-	numbers := []int{1, 2, 3}
-	fmt.Println(numbers[4])
+	//numbers := []int{1, 2, 3}
+	//fmt.Println(numbers[4])
 }
