@@ -52,6 +52,9 @@ func main() {
 	tpl = views.MustParse(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
 	r.Get("/faq", controllers.FAQ(tpl))
 
+	tpl = views.MustParse(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
+	r.Get("/signup", controllers.StaticHandler(tpl))
+
 	r.Get("/galleries/{id}", galleriesHandler)
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Page not found", http.StatusNotFound)
