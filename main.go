@@ -9,7 +9,6 @@ import (
 	"gopr/views"
 	"log"
 	"net/http"
-	"path/filepath"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -39,18 +38,19 @@ func executeTemplate(w http.ResponseWriter, filepath string) {
 	}
 	tpl.Execute(w, nil)
 }
+
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	tpl := views.MustParse(views.ParseFS(templates.FS, filepath.Join("templates", "home.gohtml")))
+	tpl := views.MustParse(views.ParseFS(templates.FS, "home.gohtml"))
 	r.Get("/", controllers.StaticHandler(tpl))
 
-	tpl = views.MustParse(views.ParseFS(templates.FS, filepath.Join("templates", "contact.gohtml")))
+	tpl = views.MustParse(views.ParseFS(templates.FS, "contact.gohtml"))
 	r.Get("/contact", controllers.StaticHandler(tpl))
 
-	tpl = views.MustParse(views.ParseFS(templates.FS, filepath.Join("templates", "faq.gohtml")))
-	r.Get("/faq", controllers.StaticHandler(tpl))
+	tpl = views.MustParse(views.ParseFS(templates.FS, "faq.gohtml"))
+	r.Get("/faq", controllers.FAQ(tpl))
 
 	r.Get("/galleries/{id}", galleriesHandler)
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
