@@ -43,10 +43,10 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	tpl := views.MustParse(views.ParseFS(templates.FS, "home.gohtml"))
+	tpl := views.MustParse(views.ParseFS(templates.FS, "layout-page.gohtml", "home-page.gohtml"))
 	r.Get("/", controllers.StaticHandler(tpl))
 
-	tpl = views.MustParse(views.ParseFS(templates.FS, "contact.gohtml"))
+	tpl = views.MustParse(views.ParseFS(templates.FS, "layout-page.gohtml", "contact-page.gohtml"))
 	r.Get("/contact", controllers.StaticHandler(tpl))
 
 	tpl = views.MustParse(views.ParseFS(templates.FS, "faq.gohtml"))
