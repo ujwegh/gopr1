@@ -1,3 +1,4 @@
+{{template "header" .}}
 <div>
     <h1>FAQ Page</h1>
     <ul>
@@ -6,6 +7,7 @@
         {{end}}
     </ul>
 </div>
+{{template "footer" .}}
 {{define "qa"}}
     <li><b>{{.Question}}</b> {{.Answer}}</li>
 {{end}}
