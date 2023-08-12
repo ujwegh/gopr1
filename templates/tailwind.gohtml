@@ -7,7 +7,7 @@
         <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
               rel="stylesheet">
     </head>
-    <body>
+    <body class="min-h-screen bg-gray-100">
     <header class="bg-gradient-to-r from-blue-800 to-indigo-800 text-white">
         <nav class="px-8 py-6 flex items-center space-x-12">
             <div class="text-4xl font-serif">Lenslocked</div>
@@ -35,11 +35,11 @@
 {{define "footer"}}
     </div>
     </div>
-    </body>
     <footer class="my-4 border-t border-indigo-400 py-1 px-2">
         <div class="text-center text-sm text-gray-600">
             &copy; Lenslocked 2023
         </div>
     </footer>
+    </body>
     </html>
 {{end}}
