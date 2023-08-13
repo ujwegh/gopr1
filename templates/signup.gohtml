@@ -15,6 +15,20 @@
                         required
                         autocomplete="email"
                         class="w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-800 rounded"
+                        value="{{.Email}}"
+                        {{if not .Email}}autofocus{{end}}
+                />
+            </div>
+            <div class="py-2">
+                <label for="name" class="text-sm font-semibold text-gray-800">Email Address</label>
+                <input
+                        name="name"
+                        id="name"
+                        type="text"
+                        placeholder="User's name"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-800 rounded"
+                        {{if not .Email}}autofocus{{end}}
                 />
             </div>
             <div class="py-2">
@@ -28,6 +42,18 @@
                         class="w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-800 rounded"
                 />
             </div>
+            <div class="py-2">
+                <label for="password-repeat" class="text-sm font-semibold text-gray-800">Password repeat</label>
+                <input
+                        name="password-repeat"
+                        id="password-repeat"
+                        type="password"
+                        placeholder="Password repeat"
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-800 rounded"
+                />
+            </div>
+            <p id="password-error" class="mt-2 text-xs text-red-500 hidden">Passwords do not match.</p>
             <div class="py-4">
                 <button
                         type="submit"
@@ -49,3 +75,21 @@
     </div>
 </div>
 {{template "footer" .}}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        const passwordError = document.getElementById("password-error");
+
+        form.addEventListener("submit", function (e) {
+            const password = document.getElementById("password").value;
+            const passwordRepeat = document.getElementById("password-repeat").value;
+
+            if (password !== passwordRepeat) {
+                passwordError.classList.remove("hidden"); // Show the error message
+                e.preventDefault(); // Prevent the form from submitting
+            } else {
+                passwordError.classList.add("hidden"); // Hide the error message
+            }
+        });
+    });
+</script>
