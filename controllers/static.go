@@ -1,26 +1,25 @@
 package controllers
 
 import (
-	"gopr/views"
 	"html/template"
 	"net/http"
 )
 
 type Static struct {
-	Template views.Template
+	Template Template
 }
 
 func (static Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	static.Template.Execute(w, nil)
 }
 
-func StaticHandler(tpl views.Template) http.HandlerFunc {
+func StaticHandler(tpl Template) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		tpl.Execute(writer, nil)
 	}
 }
 
-func FAQ(tpl views.Template) http.HandlerFunc {
+func FAQ(tpl Template) http.HandlerFunc {
 	questions := []struct {
 		Question string
 		Answer   template.HTML
