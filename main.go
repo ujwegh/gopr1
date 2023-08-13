@@ -52,13 +52,15 @@ func main() {
 	tpl = views.MustParse(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
 	r.Get("/faq", controllers.FAQ(tpl))
 
-	tpl = views.MustParse(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
-	r.Get("/signup", controllers.StaticHandler(tpl))
+	var usersC controllers.Users
+	usersC.Templates.New = views.MustParse(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
+	r.Get("/signup", usersC.New)
 
 	r.Get("/galleries/{id}", galleriesHandler)
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Page not found", http.StatusNotFound)
 	})
+
 	fmt.Println("Starting server on :3000...")
 	http.ListenAndServe(":3000", r)
 }
