@@ -1,8 +1,10 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"strings"
 )
 
@@ -25,14 +27,12 @@ func CreateOrg() error {
 	}
 	return nil
 }
-
 func Demo(numbers ...int) {
 	for _, number := range numbers {
 		fmt.Print(number, " ")
 	}
 	fmt.Println()
 }
-
 func Sum(numbers ...int) int {
 	sum := 0
 	for i := 0; i < len(numbers); i++ {
@@ -42,8 +42,13 @@ func Sum(numbers ...int) int {
 }
 
 func main() {
-	strings := []string{"the", "quick", "brown", "fox"}
-	fmt.Println(Join(strings...))
+	db, err := sql.Open("pgx", "postgres://postgres:mysecretpassword@localhost:5432/postgres?sslmode=disable")
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Connected!")
+	defer db.Close()
 }
 func Join(vals ...string) string {
 	var sb strings.Builder
