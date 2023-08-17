@@ -86,17 +86,33 @@ func main() {
 	}
 	fmt.Println("Tables created.")
 
-	name := "New User"
-	email := "new@calhoun.io"
+	//name := "New User"
+	//email := "new@calhoun.io"
+	//row := db.QueryRow(`
+	//	INSERT INTO users (name, email)
+	//	VALUES ($1, $2) RETURNING id;`, name, email)
+	//var id int
+	//err = row.Scan(&id)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//fmt.Println("User created. id =", id)
+
+	id := 5
 	row := db.QueryRow(`
-		INSERT INTO users (name, email)
-		VALUES ($1, $2) RETURNING id;`, name, email)
-	var id int
-	err = row.Scan(&id)
+		SELECT id, name, email
+		FROM users
+		WHERE id=$1;`, id)
+	var name, email string
+	err = row.Scan(&id, &name, &email)
+	if errors.Is(err, sql.ErrNoRows) {
+		fmt.Println("Error, no rows!")
+	}
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("User created. id =", id)
+	fmt.Printf("User information: id:%d name=%s, email=%s\n", id, name, email)
+
 	defer db.Close()
 }
 func Join(vals ...string) string {
