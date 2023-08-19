@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"gopr/controllers"
+	"gopr/models"
 	"gopr/templates"
 	"gopr/views"
 	"log"
@@ -43,6 +44,22 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
+	// Setup a database connection
+	cfg := models.DefaultPostgresConfig()
+	db, err := models.Open(cfg)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	// Setup our model services
+	userService := models.UserService{
+		DB: db,
+	}
+	// Setup our controllers
+	usersC := controllers.Users{
+		UserService: &userService,
+	}
+
 	tpl := views.MustParse(views.ParseFS(templates.FS, "home.gohtml", "tailwind.gohtml"))
 	r.Get("/", controllers.StaticHandler(tpl))
 
@@ -52,7 +69,6 @@ func main() {
 	tpl = views.MustParse(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
 	r.Get("/faq", controllers.FAQ(tpl))
 
-	var usersC controllers.Users
 	usersC.Templates.New = views.MustParse(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
 	r.Get("/signup", usersC.New)
 	r.Post("/signup", usersC.Create)

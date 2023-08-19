@@ -12,10 +12,6 @@ type User struct {
 	Email        string
 	PasswordHash string
 }
-type NewUser struct {
-	Email    string
-	Password string
-}
 
 type UserService struct {
 	DB *sql.DB
