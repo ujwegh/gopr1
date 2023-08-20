@@ -70,8 +70,12 @@ func main() {
 	r.Get("/faq", controllers.FAQ(tpl))
 
 	usersC.Templates.New = views.MustParse(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
+	usersC.Templates.SignIn = views.MustParse(views.ParseFS(
+		templates.FS, "signin.gohtml", "tailwind.gohtml"))
 	r.Get("/signup", usersC.New)
 	r.Post("/signup", usersC.Create)
+	r.Get("/signin", usersC.SignIn)
+	r.Post("/signin", usersC.ProcessSignIn)
 
 	r.Get("/galleries/{id}", galleriesHandler)
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
