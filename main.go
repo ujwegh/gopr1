@@ -56,8 +56,7 @@ func main() {
 	r.Get("/faq", controllers.FAQ(tpl))
 
 	usersC.Templates.New = views.MustParse(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
-	usersC.Templates.SignIn = views.MustParse(views.ParseFS(
-		templates.FS, "signin.gohtml", "tailwind.gohtml"))
+	usersC.Templates.SignIn = views.MustParse(views.ParseFS(templates.FS, "signin.gohtml", "tailwind.gohtml"))
 	r.Get("/signup", TimerMiddleware(usersC.New))
 	r.Post("/signup", usersC.Create)
 	r.Get("/signin", usersC.SignIn)
