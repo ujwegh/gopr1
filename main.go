@@ -9,37 +9,13 @@ import (
 	"gopr/models"
 	"gopr/templates"
 	"gopr/views"
-	"log"
 	"net/http"
 	"time"
 )
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	executeTemplate(w, "templates/home.gohtml")
-}
-
-func contactHandler(w http.ResponseWriter, r *http.Request) {
-	executeTemplate(w, "templates/contact.gohtml")
-}
-
-func faqHandler(w http.ResponseWriter, r *http.Request) {
-	executeTemplate(w, "templates/faq.gohtml")
-}
-
 func galleriesHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	fmt.Fprint(w, fmt.Sprintf("hi %v", id))
-}
-
-func executeTemplate(w http.ResponseWriter, filepath string) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tpl, err := views.Parse(filepath)
-	if err != nil {
-		log.Printf("parsing template: %v", err)
-		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
-		return
-	}
-	tpl.Execute(w, nil)
 }
 
 func TimerMiddleware(h http.HandlerFunc) http.HandlerFunc {
