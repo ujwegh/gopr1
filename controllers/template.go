@@ -3,5 +3,5 @@ package controllers
 import "net/http"
 
 type Template interface {
-	Execute(w http.ResponseWriter, data interface{}) // What arguments does this take?
+	Execute(w http.ResponseWriter, r *http.Request, data interface{}) // What arguments does this take?
 }
