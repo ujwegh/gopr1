@@ -6,12 +6,6 @@ import (
 	"fmt"
 )
 
-const SessionTokenBytes = 32
-
-func SessionToken() (string, error) {
-	return String(SessionTokenBytes)
-}
-
 // String returns a random string using crypto/rand.
 // n is the number of bytes being used to generate the random string.
 func String(n int) (string, error) {

@@ -17,14 +17,24 @@ type Session struct {
 }
 
 type SessionService struct {
-	DB *sql.DB
+	DB            *sql.DB
+	BytesPerToken int
 }
+
+const (
+	// The minimum number of bytes to be used for each session token.
+	MinBytesPerToken = 32
+)
 
 // Create will create a new session for the user provided. The session token
 // will be returned as the Token field on the Session type, but only the hashed
 // session token is stored in the database.
 func (ss *SessionService) Create(userID int) (*Session, error) {
-	token, err := rand.SessionToken()
+	bytesPerToken := ss.BytesPerToken
+	if bytesPerToken < MinBytesPerToken {
+		bytesPerToken = MinBytesPerToken
+	}
+	token, err := rand.String(bytesPerToken)
 	if err != nil {
 		return nil, fmt.Errorf("create: %w", err)
 	}
