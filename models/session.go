@@ -1,6 +1,10 @@
 package models
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+	"gopr/rand"
+)
 
 type Session struct {
 	ID     int
@@ -20,9 +24,18 @@ type SessionService struct {
 // will be returned as the Token field on the Session type, but only the hashed
 // session token is stored in the database.
 func (ss *SessionService) Create(userID int) (*Session, error) {
-	// TODO: Create the session token
-	// TODO: Implement SessionService.Create
-	return nil, nil
+	token, err := rand.SessionToken()
+	if err != nil {
+		return nil, fmt.Errorf("create: %w", err)
+	}
+	// TODO: Hash the session token
+	session := Session{
+		UserID: userID,
+		Token:  token,
+		// TODO: Set the TokenHash
+	}
+	// TODO: Store the session in our DB
+	return &session, nil
 }
 
 func (ss *SessionService) User(token string) (*User, error) {
