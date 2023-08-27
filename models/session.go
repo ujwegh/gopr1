@@ -45,17 +45,12 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 		Token:     token,
 		TokenHash: ss.hash(token),
 	}
-	row := ss.DB.QueryRow(`
-		UPDATE sessions
-		SET token_hash = $2
-		WHERE user_id = $1
-		RETURNING id;`, session.UserID, session.TokenHash)
+	row := ss.DB.QueryRow(`UPDATE sessions SET token_hash = $2 WHERE user_id = $1 RETURNING id;`,
+		session.UserID, session.TokenHash)
 	err = row.Scan(&session.ID)
 	if err == sql.ErrNoRows {
-		row = ss.DB.QueryRow(`
-		INSERT INTO sessions (user_id, token_hash)
-		VALUES ($1, $2)
-		RETURNING id;`, session.UserID, session.TokenHash)
+		row = ss.DB.QueryRow(`INSERT INTO sessions (user_id, token_hash) VALUES ($1, $2) RETURNING id;`,
+			session.UserID, session.TokenHash)
 		err = row.Scan(&session.ID)
 	}
 	if err != nil {
@@ -66,9 +61,7 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 
 func (ss *SessionService) Delete(token string) error {
 	tokenHash := ss.hash(token)
-	_, err := ss.DB.Exec(`
-DELETE FROM sessions
-WHERE token_hash = $1;`, tokenHash)
+	_, err := ss.DB.Exec(`DELETE FROM sessions WHERE token_hash = $1;`, tokenHash)
 	if err != nil {
 		return fmt.Errorf("delete: %w", err)
 	}

@@ -66,6 +66,7 @@ func main() {
 	r.Post("/signup", usersC.Create)
 	r.Get("/signin", usersC.SignIn)
 	r.Post("/signin", usersC.ProcessSignIn)
+	r.Post("/signout", usersC.ProcessSignOut)
 
 	r.Get("/users/me", usersC.CurrentUser)
 	r.Get("/galleries/{id}", galleriesHandler)
