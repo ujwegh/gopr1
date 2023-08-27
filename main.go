@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/csrf"
 	"gopr/controllers"
+	"gopr/migrations"
 	"gopr/models"
 	"gopr/templates"
 	"gopr/views"
@@ -38,6 +39,10 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
+	err = models.MigrateFS(db, migrations.FS, ".")
+	if err != nil {
+		panic(err)
+	}
 	// Setup our model services
 	userService := models.UserService{
 		DB: db,
