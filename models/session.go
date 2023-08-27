@@ -1,11 +1,8 @@
 package models
 
 import (
-	"crypto/sha256"
 	"database/sql"
-	"encoding/base64"
 	"fmt"
-	"gopr/rand"
 )
 
 type Session struct {
@@ -19,31 +16,22 @@ type Session struct {
 }
 
 type SessionService struct {
-	DB            *sql.DB
-	BytesPerToken int
+	DB *sql.DB
+	tm TokenManager
 }
-
-const (
-	// The minimum number of bytes to be used for each session token.
-	MinBytesPerToken = 32
-)
 
 // Create will create a new session for the user provided. The session token
 // will be returned as the Token field on the Session type, but only the hashed
 // session token is stored in the database.
 func (ss *SessionService) Create(userID int) (*Session, error) {
-	bytesPerToken := ss.BytesPerToken
-	if bytesPerToken < MinBytesPerToken {
-		bytesPerToken = MinBytesPerToken
-	}
-	token, err := rand.String(bytesPerToken)
+	token, tokenHash, err := ss.tm.New()
 	if err != nil {
-		return nil, fmt.Errorf("create: %w", err)
+		return nil, fmt.Errorf("token create: %w", err)
 	}
 	session := Session{
 		UserID:    userID,
 		Token:     token,
-		TokenHash: ss.hash(token),
+		TokenHash: tokenHash,
 	}
 	row := ss.DB.QueryRow(`UPDATE sessions SET token_hash = $2 WHERE user_id = $1 RETURNING id;`,
 		session.UserID, session.TokenHash)
@@ -60,7 +48,7 @@ func (ss *SessionService) Create(userID int) (*Session, error) {
 }
 
 func (ss *SessionService) Delete(token string) error {
-	tokenHash := ss.hash(token)
+	tokenHash := ss.tm.hash(token)
 	_, err := ss.DB.Exec(`DELETE FROM sessions WHERE token_hash = $1;`, tokenHash)
 	if err != nil {
 		return fmt.Errorf("delete: %w", err)
@@ -69,24 +57,13 @@ func (ss *SessionService) Delete(token string) error {
 }
 
 func (ss *SessionService) User(token string) (*User, error) {
-	tokenHash := ss.hash(token)
-	var userID int
-	row := ss.DB.QueryRow(`SELECT user_id FROM sessions WHERE token_hash = $1;`, tokenHash)
-	err := row.Scan(&userID)
-	if err != nil {
-		return nil, fmt.Errorf("user: %w", err)
-	}
+	tokenHash := ss.tm.hash(token)
 	var user User
-	row = ss.DB.QueryRow(`SELECT email, password_hash FROM users WHERE id = $1;`, userID)
-	err = row.Scan(&user.Email, &user.PasswordHash)
+	row := ss.DB.QueryRow(`SELECT u.id, email, password_hash FROM users u
+    join sessions s on s.token_hash = $1 and u.id = s.user_id`, tokenHash)
+	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash)
 	if err != nil {
 		return nil, fmt.Errorf("user: %w", err)
 	}
 	return &user, nil
-}
-
-func (ss *SessionService) hash(token string) string {
-	tokenHash := sha256.Sum256([]byte(token))
-	// base64 encode the data into a string
-	return base64.URLEncoding.EncodeToString(tokenHash[:])
 }
