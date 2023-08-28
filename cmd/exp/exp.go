@@ -49,6 +49,13 @@ type Order struct {
 	Description string
 }
 
+const (
+	host     = "sandbox.smtp.mailtrap.io"
+	port     = 587
+	username = "fill this in"
+	password = "fill this in"
+)
+
 func main() {
 	from := "test@ujwegh.com"
 	to := "nik29200018@gmail.com"
@@ -62,6 +69,12 @@ func main() {
 	msg.SetBody("text/plain", plaintext)
 	msg.AddAlternative("text/html", html)
 	msg.WriteTo(os.Stdout)
+	dialer := mail.NewDialer(host, port, username, password)
+	err := dialer.DialAndSend(msg)
+	if err != nil {
+		// TODO: Handle the error correctly
+		panic(err)
+	}
 }
 func Join(vals ...string) string {
 	var sb strings.Builder
