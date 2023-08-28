@@ -94,9 +94,5 @@ func (u Users) ProcessSignOut(w http.ResponseWriter, r *http.Request) {
 
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
 	user := context.User(r.Context())
-	if user == nil {
-		http.Redirect(w, r, "/signin", http.StatusFound)
-		return
-	}
 	u.Templates.Me.Execute(w, r, user)
 }

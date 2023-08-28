@@ -50,6 +50,9 @@ func main() {
 	sessionService := models.SessionService{
 		DB: db,
 	}
+	umw := controllers.UserMiddleware{
+		SessionService: &sessionService,
+	}
 	// Setup our controllers
 	usersC := controllers.Users{
 		UserService:    &userService,
@@ -75,10 +78,14 @@ func main() {
 	r.Post("/signin", usersC.ProcessSignIn)
 	r.Post("/signout", usersC.ProcessSignOut)
 
-	r.Get("/users/me", usersC.CurrentUser)
 	r.Get("/galleries/{id}", galleriesHandler)
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Page not found", http.StatusNotFound)
+	})
+
+	r.Route("/users/me", func(r chi.Router) {
+		r.Use(umw.RequireUser)
+		r.Get("/", usersC.CurrentUser)
 	})
 
 	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
@@ -87,7 +94,8 @@ func main() {
 		// TODO: Fix this before deploying
 		csrf.Secure(false),
 	)
+	handler := csrfMw(umw.SetUser(r))
 
-	fmt.Println("Starting server on :3000...")
-	http.ListenAndServe(":3000", csrfMw(r))
+	fmt.Println("Starting the server on :3000...")
+	http.ListenAndServe(":3000", handler)
 }
