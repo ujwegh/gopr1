@@ -36,11 +36,24 @@ type Email struct {
 	HTML      string
 }
 
+func (es *EmailService) ForgotPassword(to, resetURL string) error {
+	email := Email{
+		Subject:   "Reset your password",
+		To:        to,
+		Plaintext: "To reset your password, please visit the following link: " + resetURL,
+		HTML: `<p>To reset your password, please visit the following link: <a href="` + resetURL +
+			`">Reset Password</a></p>`,
+	}
+	err := es.Send(email)
+	if err != nil {
+		return fmt.Errorf("forgot password email: %w", err)
+	}
+	return nil
+}
+
 func (es *EmailService) Send(email Email) error {
 	msg := mail.NewMessage()
 	msg.SetHeader("To", email.To)
-	// TODO: Set the From field to a default value if it is not
-	// set in the Email
 	msg.SetHeader("From", getFrom(email, es))
 	msg.SetHeader("Subject", email.Subject)
 	switch {
