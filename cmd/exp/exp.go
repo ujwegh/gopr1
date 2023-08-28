@@ -1,12 +1,11 @@
 package main
 
 import (
-	stdctx "context"
 	"errors"
 	"fmt"
+	"github.com/go-mail/mail/v2"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"gopr/context"
-	"gopr/models"
+	"os"
 	"strings"
 )
 
@@ -51,13 +50,18 @@ type Order struct {
 }
 
 func main() {
-	ctx := stdctx.Background()
-	user := models.User{
-		Email: "jon@calhoun.io",
-	}
-	ctx = context.WithUser(ctx, &user)
-	retrievedUser := context.User(ctx)
-	fmt.Println(retrievedUser.Email)
+	from := "test@ujwegh.com"
+	to := "nik29200018@gmail.com"
+	subject := "This is a test email"
+	plaintext := "This is the body of the email"
+	html := `<h1>Hello there buddy!</h1><p>This is the email</p><p>Hope you enjoy it</p>`
+	msg := mail.NewMessage()
+	msg.SetHeader("To", to)
+	msg.SetHeader("From", from)
+	msg.SetHeader("Subject", subject)
+	msg.SetBody("text/plain", plaintext)
+	msg.AddAlternative("text/html", html)
+	msg.WriteTo(os.Stdout)
 }
 func Join(vals ...string) string {
 	var sb strings.Builder
