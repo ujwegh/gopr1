@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/gorilla/csrf"
+	"gopr/context"
+	"gopr/models"
 	"html/template"
 	"io"
 	"io/fs"
@@ -27,6 +29,9 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data interface
 			"csrfField": func() template.HTML {
 				return csrf.TemplateField(r)
 			},
+			"currentUser": func() *models.User {
+				return context.User(r.Context())
+			},
 		},
 	)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -46,6 +51,9 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 		template.FuncMap{
 			"csrfField": func() template.HTML {
 				return `<input type="hidden" />`
+			},
+			"currentUser": func() (*models.User, error) {
+				return nil, fmt.Errorf("currentUser not implemented")
 			},
 		},
 	)
