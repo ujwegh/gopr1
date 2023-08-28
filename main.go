@@ -88,6 +88,13 @@ func main() {
 		r.Get("/", usersC.CurrentUser)
 	})
 
+	usersC.Templates.ForgotPassword = views.MustParse(views.ParseFS(
+		templates.FS,
+		"forgot-pw.gohtml", "tailwind.gohtml",
+	))
+	r.Get("/forgot-pw", usersC.ForgotPassword)
+	r.Post("/forgot-pw", usersC.ProcessForgotPassword)
+
 	csrfKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
 	csrfMw := csrf.Protect(
 		[]byte(csrfKey),
