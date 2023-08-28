@@ -1,10 +1,12 @@
 package main
 
 import (
-	"context"
+	stdctx "context"
 	"errors"
 	"fmt"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"gopr/context"
+	"gopr/models"
 	"strings"
 )
 
@@ -49,10 +51,13 @@ type Order struct {
 }
 
 func main() {
-	ctx := context.Background()
-	ctx = context.WithValue(ctx, "favorite-color", "blue")
-	value := ctx.Value("favorite-color")
-	fmt.Println(value)
+	ctx := stdctx.Background()
+	user := models.User{
+		Email: "jon@calhoun.io",
+	}
+	ctx = context.WithUser(ctx, &user)
+	retrievedUser := context.User(ctx)
+	fmt.Println(retrievedUser.Email)
 }
 func Join(vals ...string) string {
 	var sb strings.Builder
