@@ -14,20 +14,11 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 )
 
 func galleriesHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	fmt.Fprint(w, fmt.Sprintf("hi %v", id))
-}
-
-func TimerMiddleware(h http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		h(w, r)
-		fmt.Println("Request time:", time.Since(start))
-	}
 }
 
 type config struct {
@@ -130,14 +121,17 @@ func main() {
 	usersC.Templates.Me = views.MustParse(views.ParseFS(templates.FS, "me.gohtml", "tailwind.gohtml"))
 	usersC.Templates.ForgotPassword = views.MustParse(views.ParseFS(templates.FS, "forgot-pw.gohtml", "tailwind.gohtml"))
 	usersC.Templates.CheckYourEmail = views.MustParse(views.ParseFS(templates.FS, "check-your-email.gohtml", "tailwind.gohtml"))
+	usersC.Templates.ResetPassword = views.MustParse(views.ParseFS(templates.FS, "reset-pw.gohtml", "tailwind.gohtml"))
 
-	r.Get("/signup", TimerMiddleware(usersC.New))
-	r.Post("/signup", TimerMiddleware(usersC.Create))
-	r.Get("/signin", TimerMiddleware(usersC.SignIn))
-	r.Post("/signin", TimerMiddleware(usersC.ProcessSignIn))
-	r.Post("/signout", TimerMiddleware(usersC.ProcessSignOut))
-	r.Get("/forgot-pw", TimerMiddleware(usersC.ForgotPassword))
-	r.Post("/forgot-pw", TimerMiddleware(usersC.ProcessForgotPassword))
+	r.Get("/signup", usersC.New)
+	r.Post("/signup", usersC.Create)
+	r.Get("/signin", usersC.SignIn)
+	r.Post("/signin", usersC.ProcessSignIn)
+	r.Post("/signout", usersC.ProcessSignOut)
+	r.Get("/forgot-pw", usersC.ForgotPassword)
+	r.Post("/forgot-pw", usersC.ProcessForgotPassword)
+	r.Get("/reset-pw", usersC.ResetPassword)
+	r.Post("/reset-pw", usersC.ProcessResetPassword)
 
 	r.Get("/galleries/{id}", galleriesHandler)
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
