@@ -47,7 +47,7 @@ type UserCreator interface {
 	Create(email, password string) (*User, error)
 }
 
-func (us UserService) Authenticate(email, password string) (*User, error) {
+func (us *UserService) Authenticate(email, password string) (*User, error) {
 	email = strings.ToLower(email)
 	user := User{
 		Email: email,
