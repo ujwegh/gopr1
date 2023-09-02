@@ -68,6 +68,13 @@
             &copy; Lenslocked 2023
         </div>
     </footer>
+    <script>
+        function closeAlert(event) {
+            let closeable = event.target.closest(".closeable");
+            closeable.remove();
+            // closeable.classList.add("hidden");
+        }
+    </script>
     </body>
     </html>
 {{end}}
