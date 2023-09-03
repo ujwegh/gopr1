@@ -21,9 +21,9 @@ type UserService struct {
 }
 
 var (
-	// A common pattern is to add the package as a prefix to the error for
-	// context.
-	ErrEmailTaken = errors.New("models: email address is already in use")
+	ErrEmailTaken    = errors.New("models: email address is already in use")
+	ErrUserNotFound  = errors.New("models: user not found for provided email")
+	ErrPasswordCheck = errors.New("models: password check failed")
 )
 
 func (us *UserService) Create(email, password string) (*User, error) {
@@ -71,16 +71,16 @@ func (us *UserService) Authenticate(email, password string) (*User, error) {
 	user := User{
 		Email: email,
 	}
-	row := us.DB.QueryRow(`
-		SELECT id, password_hash
-		FROM users WHERE email=$1`, email)
+	row := us.DB.QueryRow(`SELECT id, password_hash FROM users WHERE email=$1`, email)
 	err := row.Scan(&user.ID, &user.PasswordHash)
 	if err != nil {
-		return nil, fmt.Errorf("authenticate: %w", err)
+		fmt.Printf("authenticate: %v ", err)
+		return nil, ErrUserNotFound
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		return nil, fmt.Errorf("authenticate: %w", err)
+		fmt.Printf("authenticate: %v ", err)
+		return nil, ErrPasswordCheck
 	}
 	return &user, nil
 }

@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"gopr/rand"
 	"strings"
@@ -21,6 +22,10 @@ type PasswordReset struct {
 
 const (
 	DefaultResetDuration = 1 * time.Hour
+)
+
+var (
+	ErrTokenExpired = errors.New("models: token expired")
 )
 
 type PasswordResetService struct {
@@ -88,7 +93,8 @@ func (prs *PasswordResetService) Consume(token string) (*User, error) {
 		return nil, fmt.Errorf("consume: %w", err)
 	}
 	if time.Now().After(pwReset.ExpiresAt) {
-		return nil, fmt.Errorf("token expired: %v", token)
+		fmt.Printf("token expired: %v ", token)
+		return nil, ErrTokenExpired
 	}
 	err = prs.delete(pwReset.ID)
 	if err != nil {

@@ -15,7 +15,7 @@ const (
 	MinBytesPerToken = 32
 )
 
-func (tm TokenManager) New() (token, tokenHash string, err error) {
+func (tm *TokenManager) New() (token, tokenHash string, err error) {
 	bytesPerToken := tm.BytesPerToken
 	if bytesPerToken < MinBytesPerToken {
 		bytesPerToken = MinBytesPerToken

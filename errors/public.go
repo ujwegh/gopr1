@@ -1,36 +1,34 @@
 package errors
 
-import "errors"
+import (
+	"errors"
+)
 
 // Public wraps the original error with a new error that has a
 // `Public() string` method that will return a message that is
 // acceptable to display to the public. This error can also be
 // unwrapped using the traditional `errors` package approach.
-func Public(err error, msg string) error {
-	return publicError{err, msg}
+func Public(err error, msg string, code int) error {
+	return ResponseCodeError{err, msg, code}
 }
 
-// These variables are used to give us access to existing
-// functions in the std lib errors package. We can also
-// wrap them in custom functionality as needed if we want,
-// or mock them during testing.
 var (
 	As = errors.As
 	Is = errors.Is
 )
 
-// We need an implementation to work with
-type publicError struct {
-	err error
-	msg string
+type ResponseCodeError struct {
+	err  error
+	msg  string
+	code int
 }
 
-func (pe publicError) Error() string {
+func (pe ResponseCodeError) Error() string {
 	return pe.err.Error()
 }
-func (pe publicError) Public() string {
+func (pe ResponseCodeError) Public() string {
 	return pe.msg
 }
-func (pe publicError) Unwrap() error {
+func (pe ResponseCodeError) Unwrap() error {
 	return pe.err
 }

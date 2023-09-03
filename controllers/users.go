@@ -7,6 +7,7 @@ import (
 	"gopr/models"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 type Users struct {
@@ -50,9 +51,10 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 	user, err := u.UserService.Create(data.Email, data.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrEmailTaken) {
-			err = errors.Public(err, "That email address is already associated with an account.")
+			err = errors.Public(err, "That email address is already associated with an account.", http.StatusConflict)
 		}
 		u.Templates.New.Execute(w, r, data, err)
+		return
 	}
 	session, err := u.SessionService.Create(user.ID)
 	if err != nil {
@@ -75,7 +77,14 @@ func (u Users) ProcessSignIn(w http.ResponseWriter, r *http.Request) {
 	user, err := u.UserService.Authenticate(data.Email, data.Password)
 	if err != nil {
 		fmt.Println(err)
-		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		if errors.As(err, models.ErrUserNotFound) {
+			err = errors.Public(err, "User with that email not found", http.StatusNotFound)
+		} else if errors.Is(err, models.ErrPasswordCheck) {
+			err = errors.Public(err, "Password check failed", http.StatusBadRequest)
+		} else {
+			err = errors.Public(err, "Something went wrong.", http.StatusInternalServerError)
+		}
+		u.Templates.SignIn.Execute(w, r, data, err)
 		return
 	}
 	session, err := u.SessionService.Create(user.ID)
@@ -133,8 +142,8 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	vals := url.Values{
 		"token": {pwReset.Token},
 	}
-	// TODO: Make the URL here configurable
-	err = u.EmailService.ForgotPassword(data.Email, "https://www.lenslocked.com/reset-pw?"+vals.Encode())
+	resetPassUrl := os.Getenv("RESET_PASSWORD_URL")
+	err = u.EmailService.ForgotPassword(data.Email, resetPassUrl+vals.Encode())
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
@@ -161,8 +170,12 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 	user, err := u.PasswordResetService.Consume(data.Token)
 	if err != nil {
 		fmt.Println(err)
-		// TODO: Distinguish between server errors and invalid token errors.
-		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		if errors.Is(err, models.ErrTokenExpired) {
+			err = errors.Public(err, "Token expired or invalid", http.StatusBadRequest)
+		} else {
+			err = errors.Public(err, "Something went wrong.", http.StatusBadRequest)
+		}
+		u.Templates.ResetPassword.Execute(w, r, data, err)
 		return
 	}
 	err = u.UserService.UpdatePassword(user.ID, data.Password)
