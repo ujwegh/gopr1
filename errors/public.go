@@ -1,5 +1,7 @@
 package errors
 
+import "errors"
+
 // Public wraps the original error with a new error that has a
 // `Public() string` method that will return a message that is
 // acceptable to display to the public. This error can also be
@@ -7,6 +9,15 @@ package errors
 func Public(err error, msg string) error {
 	return publicError{err, msg}
 }
+
+// These variables are used to give us access to existing
+// functions in the std lib errors package. We can also
+// wrap them in custom functionality as needed if we want,
+// or mock them during testing.
+var (
+	As = errors.As
+	Is = errors.Is
+)
 
 // We need an implementation to work with
 type publicError struct {
