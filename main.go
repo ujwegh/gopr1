@@ -148,11 +148,11 @@ func main() {
 		http.Error(writer, "Page not found", http.StatusNotFound)
 	})
 	r.Route("/galleries", func(r chi.Router) {
+		r.Get("/{id}", galleriesC.Show)
 		r.Group(func(r chi.Router) {
 			r.Use(umw.RequireUser)
 			r.Get("/", galleriesC.Index)
 			r.Get("/new", galleriesC.New)
-			r.Get("/{id}", galleriesHandler)
 			r.Post("/", galleriesC.Create)
 			r.Get("/{id}/edit", galleriesC.Edit)
 			r.Post("/{id}", galleriesC.Update)
