@@ -132,6 +132,7 @@ func main() {
 	usersC.Templates.ResetPassword = views.MustParse(views.ParseFS(templates.FS, "reset-pw.gohtml", "tailwind.gohtml"))
 	galleriesC.Templates.New = views.MustParse(views.ParseFS(templates.FS, "galleries/new.gohtml", "tailwind.gohtml"))
 	galleriesC.Templates.Edit = views.MustParse(views.ParseFS(templates.FS, "galleries/edit.gohtml", "tailwind.gohtml"))
+	galleriesC.Templates.Index = views.MustParse(views.ParseFS(templates.FS, "galleries/index.gohtml", "tailwind.gohtml"))
 
 	r.Get("/signup", usersC.New)
 	r.Post("/signup", usersC.Create)
