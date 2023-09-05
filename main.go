@@ -151,6 +151,7 @@ func main() {
 			r.Use(umw.RequireUser)
 			r.Get("/new", galleriesC.New)
 			r.Get("/{id}", galleriesHandler)
+			r.Post("/", galleriesC.Create)
 		})
 	})
 	r.Route("/users/me", func(r chi.Router) {
