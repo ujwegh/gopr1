@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
+	appErrors "gopr/errors"
 	"strings"
 )
 
@@ -19,12 +20,6 @@ type User struct {
 type UserService struct {
 	DB *sql.DB
 }
-
-var (
-	ErrEmailTaken    = errors.New("models: email address is already in use")
-	ErrUserNotFound  = errors.New("models: user not found for provided email")
-	ErrPasswordCheck = errors.New("models: password check failed")
-)
 
 func (us *UserService) Create(email, password string) (*User, error) {
 	email = strings.ToLower(email)
@@ -45,7 +40,7 @@ func (us *UserService) Create(email, password string) (*User, error) {
 			if pgError.Code == pgerrcode.UniqueViolation {
 				// If this is true, it has to be an email violation since this is the
 				// only way to trigger this type of violation with our SQL.
-				return nil, ErrEmailTaken
+				return nil, appErrors.ErrEmailTaken
 			}
 		}
 		return nil, fmt.Errorf("create user: %w", err)
@@ -75,12 +70,12 @@ func (us *UserService) Authenticate(email, password string) (*User, error) {
 	err := row.Scan(&user.ID, &user.PasswordHash)
 	if err != nil {
 		fmt.Printf("authenticate: %v ", err)
-		return nil, ErrUserNotFound
+		return nil, appErrors.ErrNotFound
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
 		fmt.Printf("authenticate: %v ", err)
-		return nil, ErrPasswordCheck
+		return nil, appErrors.ErrPasswordCheck
 	}
 	return &user, nil
 }

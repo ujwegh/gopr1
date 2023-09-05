@@ -13,6 +13,12 @@ func Public(err error, msg string, code int) error {
 }
 
 var (
+	ErrNotFound      = errors.New("models: resource could not be found")
+	ErrEmailTaken    = errors.New("models: email address is already in use")
+	ErrPasswordCheck = errors.New("models: password check failed")
+)
+
+var (
 	As = errors.As
 	Is = errors.Is
 )
