@@ -85,12 +85,18 @@ func main() {
 		DB: db,
 	}
 	emailService := models.NewEmailService(cfg.SMTP)
+	galleryService := &models.GalleryService{
+		DB: db,
+	}
 	// Setup our controllers
 	usersC := controllers.Users{
 		UserService:          userService,
 		SessionService:       sessionService,
 		PasswordResetService: pwResetService,
 		EmailService:         emailService,
+	}
+	galleriesC := controllers.Galleries{
+		GalleryService: galleryService,
 	}
 	// Setup middleware
 	umw := controllers.UserMiddleware{
@@ -117,6 +123,7 @@ func main() {
 	usersC.Templates.ForgotPassword = views.MustParse(views.ParseFS(templates.FS, "forgot-pw.gohtml", "tailwind.gohtml"))
 	usersC.Templates.CheckYourEmail = views.MustParse(views.ParseFS(templates.FS, "check-your-email.gohtml", "tailwind.gohtml"))
 	usersC.Templates.ResetPassword = views.MustParse(views.ParseFS(templates.FS, "reset-pw.gohtml", "tailwind.gohtml"))
+	galleriesC.Templates.New = views.MustParse(views.ParseFS(templates.FS, "galleries/new.gohtml", "tailwind.gohtml"))
 
 	r.Get("/signup", usersC.New)
 	r.Post("/signup", usersC.Create)
@@ -132,7 +139,7 @@ func main() {
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Page not found", http.StatusNotFound)
 	})
-
+	r.Get("/galleries/new", galleriesC.New)
 	r.Route("/users/me", func(r chi.Router) {
 		r.Use(umw.RequireUser)
 		r.Get("/", usersC.CurrentUser)
