@@ -39,7 +39,13 @@ func loadEnvConfig() (config, error) {
 	if err != nil {
 		return cfg, err
 	}
-	cfg.PSQL = models.DefaultPostgresConfig()
+	cfg.PSQL.Host = os.Getenv("DB_HOST")
+	cfg.PSQL.Port = os.Getenv("DB_PORT")
+	cfg.PSQL.User = os.Getenv("DB_USER")
+	cfg.PSQL.Password = os.Getenv("DB_PASSWORD")
+	cfg.PSQL.Database = os.Getenv("DB_DATABASE")
+	cfg.PSQL.SSLMode = os.Getenv("DB_SSL_MODE")
+
 	cfg.SMTP.Host = os.Getenv("SMTP_HOST")
 	cfg.SMTP.Port, err = strconv.Atoi(os.Getenv("SMTP_PORT"))
 	if err != nil {
@@ -105,6 +111,7 @@ func main() {
 	csrfMw := csrf.Protect(
 		[]byte(cfg.CSRF.Key),
 		csrf.Secure(cfg.CSRF.Secure),
+		csrf.Path("/"),
 	)
 	handler := csrfMw(umw.SetUser(r))
 
@@ -139,7 +146,13 @@ func main() {
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Page not found", http.StatusNotFound)
 	})
-	r.Get("/galleries/new", galleriesC.New)
+	r.Route("/galleries", func(r chi.Router) {
+		r.Group(func(r chi.Router) {
+			r.Use(umw.RequireUser)
+			r.Get("/new", galleriesC.New)
+			r.Get("/{id}", galleriesHandler)
+		})
+	})
 	r.Route("/users/me", func(r chi.Router) {
 		r.Use(umw.RequireUser)
 		r.Get("/", usersC.CurrentUser)

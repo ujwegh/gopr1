@@ -6,7 +6,6 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/pressly/goose/v3"
 	"io/fs"
-	"os"
 )
 
 type PostgresConfig struct {
@@ -18,16 +17,6 @@ type PostgresConfig struct {
 	SSLMode  string
 }
 
-func DefaultPostgresConfig() PostgresConfig {
-	return PostgresConfig{
-		Host:     os.Getenv("DB_HOST"),
-		Port:     os.Getenv("DB_PORT"),
-		User:     os.Getenv("DB_USER"),
-		Password: os.Getenv("DB_PASSWORD"),
-		Database: os.Getenv("DB_NAME"),
-		SSLMode:  os.Getenv("DB_SSLMODE"),
-	}
-}
 func (cfg PostgresConfig) String() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Database, cfg.SSLMode)
