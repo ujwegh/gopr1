@@ -131,6 +131,7 @@ func main() {
 	usersC.Templates.CheckYourEmail = views.MustParse(views.ParseFS(templates.FS, "check-your-email.gohtml", "tailwind.gohtml"))
 	usersC.Templates.ResetPassword = views.MustParse(views.ParseFS(templates.FS, "reset-pw.gohtml", "tailwind.gohtml"))
 	galleriesC.Templates.New = views.MustParse(views.ParseFS(templates.FS, "galleries/new.gohtml", "tailwind.gohtml"))
+	galleriesC.Templates.Edit = views.MustParse(views.ParseFS(templates.FS, "galleries/edit.gohtml", "tailwind.gohtml"))
 
 	r.Get("/signup", usersC.New)
 	r.Post("/signup", usersC.Create)
@@ -142,7 +143,6 @@ func main() {
 	r.Get("/reset-pw", usersC.ResetPassword)
 	r.Post("/reset-pw", usersC.ProcessResetPassword)
 
-	r.Get("/galleries/{id}", galleriesHandler)
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		http.Error(writer, "Page not found", http.StatusNotFound)
 	})
@@ -152,6 +152,7 @@ func main() {
 			r.Get("/new", galleriesC.New)
 			r.Get("/{id}", galleriesHandler)
 			r.Post("/", galleriesC.Create)
+			r.Get("/{id}/edit", galleriesC.Edit)
 		})
 	})
 	r.Route("/users/me", func(r chi.Router) {
