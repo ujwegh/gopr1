@@ -149,6 +149,7 @@ func main() {
 	r.Route("/galleries", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(umw.RequireUser)
+			r.Get("/", galleriesC.Index)
 			r.Get("/new", galleriesC.New)
 			r.Get("/{id}", galleriesHandler)
 			r.Post("/", galleriesC.Create)
