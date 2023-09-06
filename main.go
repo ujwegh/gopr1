@@ -16,11 +16,6 @@ import (
 	"strconv"
 )
 
-func galleriesHandler(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	fmt.Fprint(w, fmt.Sprintf("hi %v", id))
-}
-
 type config struct {
 	PSQL models.PostgresConfig
 	SMTP models.SMTPConfig
@@ -115,15 +110,6 @@ func main() {
 	)
 	handler := csrfMw(umw.SetUser(r))
 
-	tpl := views.MustParse(views.ParseFS(templates.FS, "home.gohtml", "tailwind.gohtml"))
-	r.Get("/", controllers.StaticHandler(tpl))
-
-	tpl = views.MustParse(views.ParseFS(templates.FS, "contact.gohtml", "tailwind.gohtml"))
-	r.Get("/contact", controllers.StaticHandler(tpl))
-
-	tpl = views.MustParse(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
-	r.Get("/faq", controllers.FAQ(tpl))
-
 	usersC.Templates.New = views.MustParse(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"))
 	usersC.Templates.SignIn = views.MustParse(views.ParseFS(templates.FS, "signin.gohtml", "tailwind.gohtml"))
 	usersC.Templates.Me = views.MustParse(views.ParseFS(templates.FS, "me.gohtml", "tailwind.gohtml"))
@@ -134,6 +120,15 @@ func main() {
 	galleriesC.Templates.Edit = views.MustParse(views.ParseFS(templates.FS, "galleries/edit.gohtml", "tailwind.gohtml"))
 	galleriesC.Templates.Index = views.MustParse(views.ParseFS(templates.FS, "galleries/index.gohtml", "tailwind.gohtml"))
 	galleriesC.Templates.Show = views.MustParse(views.ParseFS(templates.FS, "galleries/show.gohtml", "tailwind.gohtml"))
+
+	tpl := views.MustParse(views.ParseFS(templates.FS, "home.gohtml", "tailwind.gohtml"))
+	r.Get("/", controllers.StaticHandler(tpl))
+
+	tpl = views.MustParse(views.ParseFS(templates.FS, "contact.gohtml", "tailwind.gohtml"))
+	r.Get("/contact", controllers.StaticHandler(tpl))
+
+	tpl = views.MustParse(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml"))
+	r.Get("/faq", controllers.FAQ(tpl))
 
 	r.Get("/signup", usersC.New)
 	r.Post("/signup", usersC.Create)
@@ -157,6 +152,7 @@ func main() {
 			r.Post("/", galleriesC.Create)
 			r.Get("/{id}/edit", galleriesC.Edit)
 			r.Post("/{id}", galleriesC.Update)
+			r.Post("/{id}/delete", galleriesC.Delete)
 		})
 	})
 	r.Route("/users/me", func(r chi.Router) {
