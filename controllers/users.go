@@ -78,7 +78,7 @@ func (u Users) ProcessSignIn(w http.ResponseWriter, r *http.Request) {
 	user, err := u.UserService.Authenticate(data.Email, data.Password)
 	if err != nil {
 		fmt.Println(err)
-		if errors.As(err, appErrors.ErrNotFound) {
+		if errors.Is(err, appErrors.ErrNotFound) {
 			err = errors.Public(err, "User with that email not found", http.StatusNotFound)
 		} else if errors.Is(err, appErrors.ErrPasswordCheck) {
 			err = errors.Public(err, "Password check failed", http.StatusBadRequest)

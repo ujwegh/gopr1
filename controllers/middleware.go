@@ -11,7 +11,7 @@ type UserMiddleware struct {
 }
 
 func (umw UserMiddleware) SetUser(next http.Handler) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := readCookie(r, CookieSession)
 		if err != nil {
 			next.ServeHTTP(w, r)
@@ -26,7 +26,7 @@ func (umw UserMiddleware) SetUser(next http.Handler) http.HandlerFunc {
 		ctx = context.WithUser(ctx, user)
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
-	})
+	}
 }
 func (umw UserMiddleware) RequireUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

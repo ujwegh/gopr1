@@ -78,7 +78,7 @@ func main() {
 		Username: username,
 		Password: password,
 	})
-	err = es.ForgotPassword("jon@calhoun.io", "https://lenslocked.com/reset-pw?token=abc123")
+	err = es.ForgotPassword("jon@calhoun.io", "https://localhost:3000/reset-pw?token=abc123")
 	if err != nil {
 		panic(err)
 	}

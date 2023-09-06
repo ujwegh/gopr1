@@ -7,7 +7,7 @@ import (
 
 const (
 	// DefaultSender is the default email address to send emails from.
-	DefaultSender = "support@lenslocked.com"
+	DefaultSender = "support@abfpay.com"
 )
 
 type EmailService struct {

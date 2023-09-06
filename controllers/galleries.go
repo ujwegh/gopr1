@@ -84,7 +84,6 @@ func (g Galleries) Index(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		Galleries []Gallery
 	}
-	g.Templates.Index.Execute(w, r, data)
 	user := context.User(r.Context())
 	galleries, err := g.GalleryService.ByUserID(user.ID)
 	if err != nil {
@@ -98,6 +97,7 @@ func (g Galleries) Index(w http.ResponseWriter, r *http.Request) {
 			Title: gallery.Title,
 		})
 	}
+	g.Templates.Index.Execute(w, r, data)
 }
 
 func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
